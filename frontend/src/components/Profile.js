@@ -121,7 +121,7 @@ const Dashboard = () => {
     return (
         <>
             <section className="mesInfos">
-                <div className={user.isAdmin === 1 ? ("card mb-5 has-background-danger-light") : ("card mb-5 has-background-info-light")}>
+                <div className={user.isAdmin == 1 ? ("card mb-5 has-background-danger-light") : ("card mb-5 has-background-info-light")}>
                     <div className="card-content">
                         <div className="media">
                             <div className="media-left">
@@ -130,7 +130,7 @@ const Dashboard = () => {
                                 </figure>
                             </div>
                             <div className="media-content">
-                                <p className={user.isAdmin === 1 ? ("title is-size-6 has-text-danger-dark mb-2") : ("title is-size-6 has-text-info-dark mb-2")}>
+                                <p className={user.isAdmin == 1 ? ("title is-size-6 has-text-danger-dark mb-2") : ("title is-size-6 has-text-info-dark mb-2")}>
                                     {user.prenom} {user.nom}<span className="has-text-grey has-text-weight-light ml-1">{user.email}</span>
                                 </p>
                                 <p className="is-italic is-size-7 has-text-grey mb-2"> A rejoint l'équipe {LastSeen(user.createdAt)}</p>
@@ -144,7 +144,7 @@ const Dashboard = () => {
                                 </p>
                             </div>
                         </div>
-                        {isAdmin === 1 ? (
+                        {isAdmin == 1 ? (
                             <div className="content pb-5">
                                 <button type='button' className="button is-pulled-right is-danger is-outlined" onClick={() => { delUser(user.id) }}>Supprimer</button>
                             </div>
@@ -165,7 +165,7 @@ const Dashboard = () => {
                                         </figure>
                                     </div>
                                     <div className="media-content">
-                                        <p className={post.user.isAdmin === 1 ? ("title is-size-6 has-text-danger-dark mb-5") : ("title is-size-6 has-text-info-dark mb-5")}>
+                                        <p className={post.user.isAdmin == 1 ? ("title is-size-6 has-text-danger-dark mb-5") : ("title is-size-6 has-text-info-dark mb-5")}>
                                             {post.user.prenom} {post.user.nom} <span className="has-text-grey has-text-weight-light">{post.user.email}</span>
                                         </p>
                                         <p className="subtitle is-size-7 has-text-grey">{LastSeen(post.createdAt)}</p>
@@ -178,7 +178,7 @@ const Dashboard = () => {
                                             (<NavLink to={'../post/' + post.id} className="button is-small is-link is-light"><span className="has-text-weight-bold mr-1">{post.comments.length}</span>commentaire</NavLink>)
                                             : (<NavLink to={'../post/' + post.id} className="button is-small is-link is-light"><span className="has-text-weight-bold mr-1">{post.comments.length}</span>commentaires</NavLink>)
                                         )}
-                                    {isAdmin === 1 ? (<button type='button' className="button is-pulled-right is-danger is-outlined" onClick={() => { deletePost(post.id) }}>Supprimer</button>) : ('')}
+                                    {isAdmin == 1 ? (<button type='button' className="button is-pulled-right is-danger is-outlined" onClick={() => { deletePost(post.id) }}>Supprimer</button>) : ('')}
                                 </div>
                             </div>
                         </div>

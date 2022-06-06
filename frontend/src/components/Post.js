@@ -9,14 +9,16 @@ import * as Yup from "yup";
 import TimeAgo from 'timeago-react';
 import * as timeago from 'timeago.js';
 import fr from 'timeago.js/lib/lang/fr';
+import jwtDecode from "jwt-decode";
 timeago.register('fr', fr);
 
 
 const Dashboard = () => {
-    const [setId] = useState('');
+    const [Id, setId] = useState('');
     const [nom, setNom] = useState('');
     const [prenom, setPrenom] = useState('');
     const [userImg, setUserImg] = useState('');
+    const [postImg, setPostImg] = useState('');
     const [email, setEmail] = useState('');
     const [isAdmin, setAdmin] = useState('');
     const [token, setToken] = useState('');
@@ -34,7 +36,6 @@ const Dashboard = () => {
         getMyPost();
         getComByPost();
     }, [location.key]);
-
     const refreshToken = async () => {
         try {
             const response = await axios.get('http://localhost:5000/users/token');
@@ -47,15 +48,14 @@ const Dashboard = () => {
             setEmail(decoded.email);
             setAdmin(decoded.isAdmin);
             setExpire(decoded.exp);
+
         } catch (error) {
             if (error.response) {
                 navigate("/", { replace: true });
             }
         }
     }
-
     const axiosJWT = axios.create();
-
     axiosJWT.interceptors.request.use(async (config) => {
         const currentDate = new Date();
         if (expire * 1000 < currentDate.getTime()) {
@@ -71,6 +71,7 @@ const Dashboard = () => {
             setExpire(decoded.exp);
         }
         return config;
+
     }, (error) => {
         return Promise.reject(error);
     });
@@ -98,6 +99,14 @@ const Dashboard = () => {
             }
         }
     };
+    function parseJwt(token) {
+        if (!token) { return; }
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace('-', '+').replace('_', '/');
+        return JSON.parse(window.atob(base64));
+    }
+    const user = parseJwt(token);
+
 
     const getMyPost = async () => {
         const response = await axiosJWT.get(`http://localhost:5000/posts/id/${id}`, {
@@ -168,7 +177,7 @@ const Dashboard = () => {
                       </p> */}
                                         <p className="">
                                             <NavLink to={'../profile/' + post.userId}
-                                                className={post.user.isAdmin === 1 ? ("title is-size-6 has-text-danger-dark mb-1") : ("title is-size-6 has-text-info-dark mb-5")}>
+                                                className={post.user.isAdmin == 1 ? ("title is-size-6 has-text-danger-dark mb-1") : ("title is-size-6 has-text-info-dark mb-5")}>
                                                 {post.user.prenom} {post.user.nom}</NavLink><span className="has-text-grey has-text-weight-light ml-1">{post.user.email}</span>
                                         </p>
                                         <p className="subtitle is-size-7 has-text-grey">{LastSeen(post.createdAt)}</p>
@@ -176,7 +185,7 @@ const Dashboard = () => {
                                 </div>
                                 <div className="content pb-5">
                                     <p>{post.postMsg}</p>
-                                    {isAdmin === 1 ? (<button type='button' className="button is-pulled-right is-danger is-outlined" onClick={() => { deletePost(post.id) }}>Supprimer</button>) : ('')}
+                                    {isAdmin == 1 ? (<button type='button' className="button is-pulled-right is-danger is-outlined" onClick={() => { deletePost(post.id) }}>Supprimer</button>) : post.userId == user.userId ? (<button type='button' className="button is-pulled-right is-danger is-outlined" onClick={() => { deletePost(post.id) }}>Supprimer</button>) : ('')}
                                 </div>
                             </div>
                         </div>
@@ -214,6 +223,7 @@ const Dashboard = () => {
 
             <section className="tousLesMessages comlist">
                 {comments.map((com, index) => {
+
                     return (
                         <div key={index}
                             className={comments.length < 2 ? ("card") : ("card cardList")}>
@@ -225,7 +235,7 @@ const Dashboard = () => {
                                         </figure>
                                     </div>
                                     <div className="media-content">
-                                        <p className={com.user.isAdmin === 1 ? ("title is-size-6 has-text-danger-dark mb-5") : ("title is-size-6 has-text-info-dark mb-5")}>
+                                        <p className={com.user.isAdmin == 1 ? ("title is-size-6 has-text-danger-dark mb-5") : ("title is-size-6 has-text-info-dark mb-5")}>
                                             {com.user.prenom} {com.user.nom} <span className="has-text-grey has-text-weight-light">{com.user.email}</span>
                                         </p>
                                         <p className="subtitle is-size-7 has-text-grey">{LastSeen(com.createdAt)}</p>
@@ -233,7 +243,9 @@ const Dashboard = () => {
                                 </div>
                                 <div className="content pb-5">
                                     <p>{com.commentMsg}</p>
-                                    {isAdmin === 1 ? (<button type='button' className="button is-pulled-right is-danger is-outlined" onClick={() => { deleteCom(com.id) }}>Supprimer</button>) : ('')}
+                                    {isAdmin == 1 ? (<button type='button' className="button is-pulled-right is-danger is-outlined" onClick={() => { deleteCom(com.id) }}>Supprimer</button>) : com.userId == user.userId ? (<button type='button' className="button is-pulled-right is-danger is-outlined" onClick={() => { deleteCom(com.id) }}>Supprimer</button>) : ('')}
+
+
                                 </div>
                             </div>
                         </div>

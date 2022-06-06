@@ -5,6 +5,7 @@ import axios from "axios";
 import jwt_decode from "jwt-decode";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import reactImageSize from 'react-image-size';
 
 import TimeAgo from 'timeago-react';
 import * as timeago from 'timeago.js';
@@ -73,15 +74,18 @@ const Dashboard = () => {
   });
 
   const initialValues = {
-    postMsg: ""
+    postMsg: "",
+    postImg: ""
   };
 
   const validationSchema = Yup.object().shape({
     postMsg: Yup.string().min(1, "Le message doit contenir au moins 1 caractère").required("")
   });
 
+
   const onSubmit = async (data, { resetForm }) => {
     console.log(data);
+
     try {
       await axios.post('http://localhost:5000/posts', data);
       setPosts(posts);
@@ -144,6 +148,7 @@ const Dashboard = () => {
                         </div>
                         <ErrorMessage name="postMsg" component="p" className="notification is-danger is-italic is-light p-2 mt-2" />
                       </div>
+
                       <button type='submit' className="button is-pulled-right is-link is-outlined mt-4">Envoyer</button>
                     </Form>
                   </Formik>
@@ -168,7 +173,7 @@ const Dashboard = () => {
                   <div className="media-content">
                     <p className="">
                       <NavLink to={'../profile/' + post.userId}
-                        className={post.user.isAdmin === 1 ? ("title is-size-6 has-text-danger-dark mb-1") : ("title is-size-6 has-text-info-dark mb-5")}>
+                        className={post.user.isAdmin == 1 ? ("title is-size-6 has-text-danger-dark mb-1") : ("title is-size-6 has-text-info-dark mb-5")}>
                         {post.user.prenom} {post.user.nom}</NavLink><span className="has-text-grey has-text-weight-light ml-1">{post.user.email}</span>
                     </p>
                     <p className="is-size-7 has-text-grey">{LastSeen(post.createdAt)}</p>
@@ -176,6 +181,7 @@ const Dashboard = () => {
                 </div>
                 <div className="content">
                   <p>{post.postMsg}</p>
+                  <img src={post.postImg} alt="" />
                   {post.comments.length === 0 ? (<NavLink to={'../post/' + post.id} className="button is-small is-link is-light">Commenter</NavLink>)
                     : (post.comments.length === 1 ?
                       (<NavLink to={'../post/' + post.id} className="button is-small is-link is-light"><span className="has-text-weight-bold mr-1">{post.comments.length}</span>commentaire</NavLink>)
